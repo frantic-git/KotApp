@@ -50,4 +50,34 @@ class SecondActivity : AppCompatActivity(),View.OnClickListener {
         setResult(Activity.RESULT_OK,intent)
         finish()
     }
+
+    override fun onRestart() {
+        Log.d(tag, "onResume")
+        super.onRestart()
+    }
+
+    override fun onStart() {
+        Log.d(tag,"onStart")
+        super.onStart()
+    }
+
+    override fun onPause() {
+        Log.d(tag, "onPause")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d(tag, "onStop")
+        super.onStop()
+    }
+
+    override fun onResume() {
+        Log.d(tag, "onResume")
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        Log.d(tag, "onDestroy")
+        super.onDestroy()
+    }
 }
