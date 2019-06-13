@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
                 startActivityForResult(intent, 2);
             }
             R.id.btnWeb ->{
-                intent = Intent(Intent.ACTION_VIEW, Uri.parse("http://developer.android.com"))
+                intent = Intent(Intent.ACTION_VIEW, Uri.parse("http://ya.ru"))
                 startActivity(intent)
             }
             R.id.btnMap ->{
