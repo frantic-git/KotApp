@@ -17,7 +17,6 @@ class BrowserActivity : AppCompatActivity() {
         val webView : WebView = findViewById(R.id.webView)
         webView.webViewClient = WebViewClient()
         val data = intent.data
-        //if(data==null)return
-        webView.loadUrl(data.toString()?:return)
+        webView.loadUrl(data?.toString())
     }
 }
