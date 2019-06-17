@@ -5,25 +5,21 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.graphics.Color
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.GridLayout
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import java.net.URI
-import java.nio.file.Files.delete
 import kotlin.concurrent.thread
-
 
 class MainActivity : AppCompatActivity(),View.OnClickListener {
 
@@ -48,6 +44,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
     lateinit var dbHelper: DBHelper
 
     val tag : String = "frantic_log"
+    private val DB_VERSION : Int = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +81,32 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         btnDelete.setOnClickListener(this)
 
         dbHelper = DBHelper(this)
+        val db = dbHelper.writableDatabase
+
+        Log.d(tag, " --- Staff db v." + db.version + " --- ");
+        writeStaff(db);
+        dbHelper.close();
+
+    }
+
+    private fun writeStaff(db : SQLiteDatabase){
+        val c = db.rawQuery("select * from person", null)
+        logCursor(c, "Table person")
+        c.close()
+    }
+
+    private fun logCursor(c:Cursor,title:String){
+
+        Log.d(tag, "$title. ${c.count} rows ")
+        val sb = StringBuilder()
+
+        while(c.moveToNext()){
+            sb.setLength(0)
+            for (cn in c.columnNames) {
+                sb.append("$cn = ${c.getString(c.getColumnIndex(cn))};")
+            }
+            Log.d(tag, sb.toString())
+        }
     }
 
     override fun onClick(v: View?) {
@@ -138,11 +161,11 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         Log.d(tag, "--- update in emailList email ---")
         val db = dbHelper.writableDatabase
         val cv = ContentValues()
-        val name = etEmail.text.toString()
+        val name = etName.text.toString()
         val email = etEmail.text.toString()
 
         cv.put("email",email)
-        val rowId = db.update("emailList", cv,"name = $name", null)
+        val rowId = db.update("emailList", cv,"name = ?", arrayOf(name))
         Log.d(tag, "row updated, ID = $rowId")
         db.close()
     }
@@ -150,9 +173,9 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
     private fun delete(){
         Log.d(tag, "--- delete in emailList ---")
         val db = dbHelper.writableDatabase
-        val name = etEmail.text.toString()
+        val name = etName.text.toString()
 
-        val rowId = db.delete("emailList","name = $name", null)
+        val rowId = db.delete("emailList","name = \"$name\"" , null)
         Log.d(tag, "row deleted, ID = $rowId")
         db.close()
     }
@@ -183,10 +206,11 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
 
     private fun read(){
         thread(start = true){
+
             val db = dbHelper.readableDatabase
-            val cur = db.query("emailList",null, null, null, null, null, null)
-            val colId = cur.getColumnIndex("id")
-            val nameColId = cur.getColumnIndex("name")
+            var cur = db.query("emailList",null, null, null, null, null, null)
+            var colId = cur.getColumnIndex("id")
+            var nameColId = cur.getColumnIndex("name")
             val emailColId = cur.getColumnIndex("email")
             if(cur.count == 0)Log.d(tag,"emailList is empty")
             while (cur.moveToNext()) {
@@ -195,6 +219,21 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
                         " email: ${cur.getString(emailColId)} ")
             }
             cur.close()
+
+            Log.d(tag, "Table person")
+            cur = db.query("person", null, null, null, null, null, null)
+            colId = cur.getColumnIndex("id")
+            nameColId = cur.getColumnIndex("name")
+            val positionColId = cur.getColumnIndex("position")
+
+            if(cur.count == 0)Log.d(tag, "person table is empty")
+            while(cur.moveToNext()){
+                Log.d(tag, "row id ${cur.getInt(colId)}" +
+                        "  name: ${cur.getString(nameColId)}" +
+                        " position: ${cur.getString(positionColId)} ")
+            }
+            cur.close()
+
             dbHelper.close()
         }
     }
@@ -258,18 +297,61 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         super.onDestroy()
     }
 
-    inner class DBHelper(context: Context) : SQLiteOpenHelper(context, "KotDB", null, 1) {
+    inner class DBHelper(context: Context) : SQLiteOpenHelper(context, "KotDB", null, DB_VERSION) {
 
         override fun onCreate(db: SQLiteDatabase?) {
             Log.d(this@MainActivity.tag,"--------------- CREATE DATABASE -------------")
+
+            db?.beginTransaction()
+
             db?.execSQL("create table emailList ("
                     + "id integer primary key autoincrement,"
                     + "name text,"
                     + "email text" + ");")
+
+            val personName = arrayOf("Шепот", "Хромой", "Душелов", "Меняющий", "Костоправ")
+            val personPositions = arrayOf("хранитель","взятый", "сержант", "лейтенант", "хирург")
+
+            val cv = ContentValues()
+
+            // создаем таблицу людей
+            db?.execSQL("create table person ("
+                    + "id integer primary key autoincrement,"
+                    + "name text, position text);")
+
+            for( i in personName.indices) {
+                cv.clear()
+                cv.put("name", personName[i])
+                cv.put("position", personPositions[i])
+                db?.insert("person",null,cv)
+            }
+
+            db?.setTransactionSuccessful()
+            db?.endTransaction()
         }
 
         override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+            Log.d(tag, " --- onUpgrade database from " + oldVersion
+                    + " to " + newVersion + " version --- ");
 
+            if (oldVersion == 1 && newVersion == 2) {
+                val personName = arrayOf("Шепот", "Хромой", "Душелов", "Меняющий", "Костоправ")
+                val personPositions = arrayOf("хранитель","взятый", "сержант", "лейтенант", "хирург")
+
+                val cv = ContentValues()
+
+                // создаем таблицу людей
+                db?.execSQL("create table person ("
+                        + "id integer primary key autoincrement,"
+                        + "name text, position text);")
+
+                for( i in personName.indices) {
+                    cv.clear()
+                    cv.put("name", personName[i])
+                    cv.put("position", personPositions[i])
+                    db?.insert("person",null,cv)
+                }
+            }
         }
     }
 

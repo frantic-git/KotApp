@@ -15,7 +15,7 @@ class ThirdActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var btnCenter:Button
     lateinit var btnRight:Button
 
-    val tag:String = "frantic_log"
+    private val tag:String = "frantic_log"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
