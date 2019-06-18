@@ -14,12 +14,12 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.concurrent.thread
+
 
 class MainActivity : AppCompatActivity(),View.OnClickListener {
 
@@ -80,7 +80,19 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         btnUpdate.setOnClickListener(this)
         btnDelete.setOnClickListener(this)
 
-        dbHelper = DBHelper(this)
+        val ltInflater = layoutInflater
+        val view = ltInflater.inflate(R.layout.text,null, false)
+        val lp = view.layoutParams
+
+        Log.d(tag, "Class of view: " + view.javaClass.toString())
+        Log.d(tag, "LayoutParams of view is null: " + (lp == null))
+        Log.d(tag, "Text of view: " + (view as TextView).text)
+
+        val linLayout:LinearLayout = findViewById(R.id.linLayout)
+        linLayout.addView(view)
+        Log.d(tag, "Class of view: " + view.javaClass.toString());
+
+        dbHelper = DBHelper.getInstance(this, DB_VERSION)
         val db = dbHelper.writableDatabase
 
         Log.d(tag, " --- Staff db v." + db.version + " --- ");
@@ -115,11 +127,13 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
             R.id.btnColor -> {
                 Log.d(tag, "push Color")
                 val intent = Intent(this, SecondActivity::class.java)
+                intent.putExtra("DB_VERSION", DB_VERSION)
                 startActivityForResult(intent, 1)
             }
             R.id.btnAlign -> {
                 Log.d(tag, "push Align")
                 val intent = Intent(this, ThirdActivity::class.java)
+                intent.putExtra("DB_VERSION", DB_VERSION)
                 startActivityForResult(intent, 2);
             }
             R.id.btnWeb ->{
@@ -297,6 +311,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
         super.onDestroy()
     }
 
+    /* //Реализация внутреннего класса
     inner class DBHelper(context: Context) : SQLiteOpenHelper(context, "KotDB", null, DB_VERSION) {
 
         override fun onCreate(db: SQLiteDatabase?) {
@@ -354,5 +369,6 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
             }
         }
     }
+    */
 
 }
