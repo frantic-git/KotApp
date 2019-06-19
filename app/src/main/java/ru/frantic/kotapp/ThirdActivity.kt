@@ -82,6 +82,8 @@ class ThirdActivity : AppCompatActivity(), View.OnClickListener {
                     if (sbArray.get(key)) Log.d(tag, names[key])
                     i++
                 }
+                val intent = Intent(this, FourthActivity::class.java)
+                startActivity(intent)
                 return
             }
         }

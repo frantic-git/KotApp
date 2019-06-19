@@ -2,6 +2,7 @@ package ru.frantic.kotapp
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ExpandableListView
 import android.widget.SimpleExpandableListAdapter
@@ -13,6 +14,8 @@ class FourthActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var adapterHelper: AdapterHelper
     lateinit var adapter: SimpleExpandableListAdapter
     lateinit var tvInfo: TextView
+
+    private val tag = "frantic_log"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,43 +29,31 @@ class FourthActivity : AppCompatActivity(), View.OnClickListener {
         elvMain = findViewById(R.id.elvMain)
         elvMain.setAdapter(adapter)
 
-        elvMain.setOnGroupClickListener()
+        //нажатие на группу
+        elvMain.setOnGroupClickListener(object: ExpandableListView.OnGroupClickListener{
+            override fun onGroupClick(parent: ExpandableListView?, v: View?, groupPosition: Int, id: Long): Boolean {
+                Log.d(tag, "onGroupClick groupPosition = $groupPosition id = $id")
+                if(groupPosition == 1)return true
+                return false
+            }
+        })
 
-        /*
-       // нажатие на группу
-        elvMain.setOnGroupClickListener(new OnGroupClickListener() {
-      public boolean onGroupClick(ExpandableListView parent, View v,
-          int groupPosition, long id) {
-        Log.d(LOG_TAG, "onGroupClick groupPosition = " + groupPosition +
-                " id = " + id);
-        // блокируем дальнейшую обработку события для группы с позицией 1
-        if (groupPosition == 1) return true;
-
-        return false;
-      }
-    });
-
-        // сворачивание группы
-        elvMain.setOnGroupCollapseListener(new OnGroupCollapseListener() {
-      public void onGroupCollapse(int groupPosition) {
-        Log.d(LOG_TAG, "onGroupCollapse groupPosition = " + groupPosition);
-        tvInfo.setText("Свернули " + ah.getGroupText(groupPosition));
-      }
-    });
+        //сворачивание группы
+        elvMain.setOnGroupCollapseListener(object: ExpandableListView.OnGroupCollapseListener{
+            override fun onGroupCollapse(groupPosition: Int) {
+                Log.d(tag, "onGroupCollapse groupPosition = $groupPosition")
+                tvInfo.text = "Свернули ${adapterHelper.getGroupText(groupPosition)}"
+            }
+        })
 
         // разворачивание группы
-        elvMain.setOnGroupExpandListener(new OnGroupExpandListener() {
-      public void onGroupExpand(int groupPosition) {
-        Log.d(LOG_TAG, "onGroupExpand groupPosition = " + groupPosition);
-        tvInfo.setText("Развернули " + ah.getGroupText(groupPosition));
-      }
-    });
+        elvMain.setOnGroupExpandListener{
+            Log.d(tag, "onGroupExpand groupPosition = $it")
+            tvInfo.text = "Развернули ${adapterHelper.getGroupText(it)}"
+        }
 
-        // разворачиваем группу с позицией 2
-        elvMain.expandGroup(2);
-
-         */
-
+        //разворачиваем группу с позицией 2
+        elvMain.expandGroup(2)
     }
 
     override fun onClick(v: View?) {
