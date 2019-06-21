@@ -149,6 +149,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
             }
             R.id.btnSave ->{
                 savePref()
+                intent = Intent(this, SixthActivity::class.java)
+                startActivity(intent)
             }
             R.id.btnLoad ->{
                 loadPref()

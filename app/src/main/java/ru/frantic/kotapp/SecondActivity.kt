@@ -38,7 +38,7 @@ class SecondActivity : AppCompatActivity(),View.OnClickListener {
         btnBlue.setOnClickListener(this)
         btnGreen.setOnClickListener(this)
 
-        val DB_VERSION:Int = intent.extras.getInt("DB_VERSION")
+        val DB_VERSION:Int = intent?.extras?.getInt("DB_VERSION") ?: 1
 
         ltInflater = layoutInflater
         linPersonList = findViewById(R.id.linPersonList)
