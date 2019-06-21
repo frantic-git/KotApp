@@ -77,11 +77,11 @@ class AdapterHelper(_ctx:Context) {
     }
 
     fun getGroupText(groupPos:Int): String? {
-        return (adapter.getGroup(groupPos) as Map<String, String>).get(ATTR_GROUP_NAME)
+        return (adapter.getGroup(groupPos) as? Map<String, String>)?.get(ATTR_GROUP_NAME)
     }
 
     fun getChildText(groupPos: Int, childPos: Int):String?{
-        return (adapter.getChild(groupPos, childPos) as Map<String, String>).get(ATTR_SKILL_NAME)
+        return (adapter.getChild(groupPos, childPos) as? Map<String, String>)?.get(ATTR_SKILL_NAME)
     }
 
     fun getGroupChildText(groupPos: Int, childPos:Int):String?{

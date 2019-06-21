@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
                 Log.d(tag, "push Align")
                 val intent = Intent(this, ThirdActivity::class.java)
                 intent.putExtra("DB_VERSION", DB_VERSION)
-                startActivityForResult(intent, 2);
+                startActivityForResult(intent, 2)
             }
             R.id.btnWeb ->{
                 intent = Intent(Intent.ACTION_VIEW, Uri.parse("http://ya.ru"))
@@ -154,6 +154,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
             }
             R.id.btnLoad ->{
                 loadPref()
+                intent = Intent(this, FifthActivity::class.java)
+                startActivity(intent)
             }
             R.id.btnAdd ->{
                 add()
