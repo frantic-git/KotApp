@@ -159,6 +159,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
             }
             R.id.btnAdd ->{
                 add()
+                intent = Intent(this, SeventhActivity::class.java)
+                startActivity(intent)
             }
             R.id.btnRead ->{
                 read()
@@ -207,18 +209,24 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
     }
 
     private fun add(){
+
+        val name = etName.text.toString()
+        val email = etEmail.text.toString()
+
+        if(name.equals(""))return
+        if(email.equals(""))return
+
         Log.d(tag, " --- insert in emailList table ---")
 
         val db = dbHelper.writableDatabase
         val cv = ContentValues()
-        val name = etName.text.toString()
-        val email = etEmail.text.toString()
 
         cv.put("name",name)
         cv.put("email",email)
 
         val rowID = db.insert("emailList", null, cv)
         Log.d(tag, "row inserted, ID = ${rowID}")
+        db.close()
         dbHelper.close()
     }
 

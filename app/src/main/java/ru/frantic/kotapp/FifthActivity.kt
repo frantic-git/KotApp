@@ -1,8 +1,13 @@
 package ru.frantic.kotapp
 
+import android.content.Context
+import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.ListView
+import android.widget.SimpleAdapter
+import android.widget.TextView
 
 class FifthActivity : AppCompatActivity() {
 
@@ -38,23 +43,38 @@ class FifthActivity : AppCompatActivity() {
             ATTRIBUTE_NAME_IMAGE)
         val to = intArrayOf(R.id.tvText, R.id.tvValue, R.id.ivImg)
 
+        val sAdapter = KotSimpleAdapter(this, data, R.layout.item_simple_adapter_ext,from,to)
 
+        lvSimple = findViewById(R.id.lvSimple)
+        lvSimple.adapter = sAdapter
 
-        /*
+    }
 
-    // массив имен атрибутов, из которых будут читаться данные
-    String[] from = { ATTRIBUTE_NAME_TEXT, ATTRIBUTE_NAME_VALUE,
-        ATTRIBUTE_NAME_IMAGE };
-    // массив ID View-компонентов, в которые будут вставлять данные
-    int[] to = { R.id.tvText, R.id.tvValue, R.id.ivImg };
+    inner class KotSimpleAdapter(
+        context: Context?,
+        data:ArrayList<Map<String, Any>>?, // data: MutableList<out MutableMap<String, *>>?,
+        resource: Int,
+        from: Array<out String>?,
+        to: IntArray?
+    ) : SimpleAdapter(context, data, resource, from, to) {
 
-    // создаем адаптер
-    MySimpleAdapter sAdapter = new MySimpleAdapter(this, data,
-        R.layout.item, from, to);
+        override fun setViewText(v:TextView, text:String){
+            super.setViewText(v, text)
+            if(v.id == R.id.tvValue){
+                val i = Integer.parseInt(text)
+                if(i<0)
+                    v.setTextColor(Color.RED)
+                else
+                    v.setTextColor(Color.GREEN)
+            }
+        }
 
-    // определяем список и присваиваем ему адаптер
-    lvSimple = (ListView) findViewById(R.id.lvSimple);
-    lvSimple.setAdapter(sAdapter);
-         */
+        override fun setViewImage(v: ImageView?, value: Int) {
+            super.setViewImage(v, value)
+            when (value) {
+                negative -> v?.setBackgroundColor(Color.RED)
+                positive -> v?.setBackgroundColor(Color.GREEN)
+            }
+        }
     }
 }
