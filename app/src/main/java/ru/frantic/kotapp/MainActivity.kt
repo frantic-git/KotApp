@@ -164,6 +164,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
             }
             R.id.btnRead ->{
                 read()
+                intent = Intent(this, EightActivity::class.java)
+                startActivity(intent)
             }
             R.id.btnClear ->{
                 clear()
